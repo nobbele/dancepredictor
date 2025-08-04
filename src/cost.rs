@@ -131,16 +131,16 @@ fn doublestep_cost(
     };
 
     let prev_heel = prev
-        .hitting_columns
+        .activated_columns
         .get_foot_part_index(FootPart::heel(activated_side));
     let prev_toe = prev
-        .hitting_columns
+        .activated_columns
         .get_foot_part_index(FootPart::toe(activated_side));
     let next_heel = next
-        .hitting_columns
+        .activated_columns
         .get_foot_part_index(FootPart::heel(activated_side));
     let next_toe = next
-        .hitting_columns
+        .activated_columns
         .get_foot_part_index(FootPart::toe(activated_side));
 
     if prev_heel == None {
@@ -152,5 +152,8 @@ fn doublestep_cost(
         return 0.0;
     }
 
-    DOUBLESTEP_COST * stage.distance_between(prev_heel.unwrap(), next_heel.unwrap()).powi(3)
+    DOUBLESTEP_COST
+        * stage
+            .distance_between(prev_heel.unwrap(), next_heel.unwrap())
+            .powi(3)
 }

@@ -1,6 +1,5 @@
-use petgraph::dot::Dot;
-use rgc_chart::models::common::Key;
 use dancepredictor::{DanceStage, StepGraph};
+use rgc_chart::models::common::Key;
 
 fn main() {
     let dance_stage = DanceStage::ddr_solo();
@@ -21,7 +20,7 @@ fn main() {
         3.0,
         &vec![Key::normal(), Key::empty(), Key::empty(), Key::normal()],
     );
-    for i in 4..20 {
+    for i in 4..100000 {
         graph.append(
             i as f32,
             &vec![
@@ -48,13 +47,13 @@ fn main() {
             ],
         );
     }
-    use std::io::Write;
-    write!(
-        std::fs::File::create("out.txt").unwrap(),
-        "{}",
-        Dot::with_config(&graph.graph, &[])
-    )
-    .unwrap();
+    // use std::io::Write;
+    // write!(
+    //     std::fs::File::create("out.txt").unwrap(),
+    //     "{}",
+    //     Dot::with_config(&graph.graph, &[])
+    // )
+    // .unwrap();
     println!("{}", graph.graph.node_count());
     println!("{}", graph.graph.edge_count());
     // println!("{}", Dot::with_config(&graph.graph, &[]));

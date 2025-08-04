@@ -1,6 +1,7 @@
 use crate::extensions::HasPressRequirement;
 use crate::stage::DanceStage;
 use rgc_chart::models::common::Row;
+use smallvec::{smallvec, SmallVec};
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq, Hash)]
@@ -92,11 +93,11 @@ impl Display for FootPart {
 
 /// Represents what foot part is on a column.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct FootPlacement(pub Vec<FootPart>);
+pub struct FootPlacement(pub SmallVec<[FootPart; 4]>);
 
 impl FootPlacement {
     pub(crate) fn new(columns: usize) -> Self {
-        FootPlacement(vec![FootPart::None; columns])
+        FootPlacement(smallvec![FootPart::None; columns])
     }
 
     pub(crate) fn get_foot_part_index(&self, part: FootPart) -> Option<usize> {
@@ -235,13 +236,13 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::None,
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None,
@@ -261,13 +262,13 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::RightHeel,
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None,
@@ -287,37 +288,37 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::LeftToe,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftToe,
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::RightHeel,
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::RightHeel,
                     FootPart::RightToe,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::RightToe,
                     FootPart::RightHeel,
                     FootPart::None,

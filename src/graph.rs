@@ -6,6 +6,7 @@ use ordered_float::OrderedFloat;
 use petgraph::algo::astar;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
 use rgc_chart::models::common::Row;
+use rustc_hash::FxBuildHasher;
 use std::collections::{HashMap, VecDeque};
 use std::fmt::Display;
 
@@ -36,8 +37,8 @@ pub struct StepGraph {
 
     queue: VecDeque<NodeIndex>,
     pub graph: DiGraph<GraphState, f32>,
-    node_cache: HashMap<GraphState, NodeIndex>,
-    edge_cache: HashMap<(NodeIndex, NodeIndex, OrderedFloat<f32>), EdgeIndex>,
+    node_cache: HashMap<GraphState, NodeIndex, FxBuildHasher>,
+    edge_cache: HashMap<(NodeIndex, NodeIndex, OrderedFloat<f32>), EdgeIndex, FxBuildHasher>,
 
     start_node: NodeIndex,
 }
@@ -45,7 +46,7 @@ pub struct StepGraph {
 impl StepGraph {
     pub fn new(dance_stage: DanceStage) -> Self {
         let mut graph = DiGraph::new();
-        let mut state_map = HashMap::new();
+        let mut state_map = HashMap::default();
 
         let start_state =
             GraphState::new(f32::NEG_INFINITY, State::new(dance_stage.column_count()));
@@ -61,7 +62,7 @@ impl StepGraph {
             queue,
             graph,
             node_cache: state_map,
-            edge_cache: HashMap::new(),
+            edge_cache: HashMap::default(),
 
             start_node,
         }
@@ -75,15 +76,8 @@ impl StepGraph {
         let mut new_states = Vec::new();
         while let Some(prev) = self.queue.pop_front() {
             for permutation in &permutations {
-                let next = GraphState::new(time, self.graph[prev].state.append(permutation));
-                let next = *self
-                    .node_cache
-                    .entry(next)
-                    .or_insert_with_key(|next| self.graph.add_node(next.clone()));
-
+                let next_state = GraphState::new(time, self.graph[prev].state.append(permutation));
                 let prev_state = &self.graph[prev];
-                let next_state = &self.graph[next];
-
                 let cost = total_cost(
                     &self.dance_stage,
                     &prev_state.state,
@@ -91,20 +85,31 @@ impl StepGraph {
                     next_state.time.0 - prev_state.time.0,
                 );
 
-                if !self
-                    .edge_cache
-                    .contains_key(&(prev, next, OrderedFloat(cost)))
-                {
-                    let edge = self.graph.add_edge(prev, next, cost);
-                    self.edge_cache
-                        .insert((prev, next, OrderedFloat(cost)), edge);
-                }
+                let next = if let Some(&next) = self.node_cache.get(&next_state) {
+                    next
+                } else {
+                    let next = self.graph.add_node(next_state.clone());
+                    self.node_cache.insert(next_state, next);
+                    new_states.push(next);
+                    next
+                };
 
-                new_states.push(next);
+                self.add_edge(prev, next, cost);
             }
         }
 
         self.queue.extend(new_states);
+    }
+
+    fn add_edge(&mut self, prev: NodeIndex, next: NodeIndex, cost: f32) {
+        if !self
+            .edge_cache
+            .contains_key(&(prev, next, OrderedFloat(cost)))
+        {
+            let edge = self.graph.add_edge(prev, next, cost);
+            self.edge_cache
+                .insert((prev, next, OrderedFloat(cost)), edge);
+        }
     }
 
     pub fn compute_path(&mut self) -> Vec<FootPlacement> {
@@ -144,8 +149,8 @@ impl StepGraph {
 mod tests {
     use super::*;
     use crate::feet::FootPart;
-    use petgraph::dot::Dot;
     use rgc_chart::models::common::Key;
+    use smallvec::smallvec;
 
     #[test]
     fn test_graph_walk() {
@@ -170,25 +175,25 @@ mod tests {
         assert_eq!(
             graph.compute_path(),
             vec![
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::LeftHeel,
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::None,
                     FootPart::RightHeel,
                     FootPart::LeftHeel,
                     FootPart::None
                 ]),
-                FootPlacement(vec![
+                FootPlacement(smallvec![
                     FootPart::None,
                     FootPart::None,
                     FootPart::LeftHeel,
