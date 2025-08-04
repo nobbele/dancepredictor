@@ -41,7 +41,8 @@ impl State {
             };
 
             let prev_foot_part = self.final_columns.at(column);
-            if prev_foot_part != FootPart::None && !result.activated_columns.contains(prev_foot_part)
+            if prev_foot_part != FootPart::None
+                && !result.activated_columns.contains(prev_foot_part)
             {
                 let moved_heel = result
                     .activated_columns
@@ -79,198 +80,197 @@ impl Display for State {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use smallvec::smallvec;
 
     #[test]
     fn test_state_progression() {
         let state = State::new(4);
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::None,
                 FootPart::None,
-            ])
+            )
         );
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::None,
             FootPart::None,
             FootPart::RightHeel,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::None,
                 FootPart::RightHeel,
-            ])
+            )
         );
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::None,
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::RightHeel,
-            ])
+            )
         );
         assert_eq!(
             state.activated_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::None,
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::None,
-            ])
+            )
         );
     }
 
     #[test]
     fn test_state_progression_brackets() {
         let state = State::new(4);
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::LeftToe,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::LeftToe,
                 FootPart::None,
-            ])
+            )
         );
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::None,
             FootPart::None,
             FootPart::RightHeel,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::LeftToe,
                 FootPart::RightHeel,
-            ])
+            )
         );
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::None,
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::RightHeel,
-            ])
+            )
         );
     }
 
     #[test]
     fn test_state_progression_bracket_consecutive() {
         let state = State::new(4);
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::LeftToe,
             FootPart::None,
-        ]));
-        let state = state.append(&FootPlacement(smallvec![
+        ));
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftToe,
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftToe,
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::None,
-            ])
+            )
         );
     }
 
     #[test]
     fn test_state_progression_toe_to_other_heel() {
         let state = State::new(4);
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
             FootPart::None,
-        ]));
-        let state = state.append(&FootPlacement(smallvec![
+        ));
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::RightHeel,
             FootPart::RightToe,
             FootPart::None,
             FootPart::None,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::RightHeel,
                 FootPart::RightToe,
                 FootPart::None,
                 FootPart::None,
-            ])
+            )
         );
     }
 
     #[test]
     fn test_state_progression_jack() {
         let state = State::new(4);
-        let state = state.append(&FootPlacement(smallvec![
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::LeftHeel,
             FootPart::None,
             FootPart::None,
             FootPart::None,
-        ]));
-        let state = state.append(&FootPlacement(smallvec![
+        ));
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::None,
             FootPart::None,
             FootPart::RightHeel,
-        ]));
-        let state = state.append(&FootPlacement(smallvec![
+        ));
+        let state = state.append(&FootPlacement::from_ddr_solo(
             FootPart::None,
             FootPart::None,
             FootPart::None,
             FootPart::RightHeel,
-        ]));
+        ));
         assert_eq!(
             state.final_columns,
-            FootPlacement(smallvec![
+            FootPlacement::from_ddr_solo(
                 FootPart::LeftHeel,
                 FootPart::None,
                 FootPart::None,
                 FootPart::RightHeel,
-            ])
+            )
         );
     }
 }

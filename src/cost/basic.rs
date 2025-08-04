@@ -1,37 +1,9 @@
-use crate::feet::{FootPart, FootPartIndices, Side};
-use crate::stage::DanceStage;
-use crate::state::State;
+use crate::cost::{CostParams, DOUBLESTEP_COST, FACING_COST, MINE_COST, MOVEMENT_COST};
+use crate::feet::{FootPartIndices, Side};
+use crate::FootPart;
+use rgc_chart::models::common::KeyType;
 
-const MOVEMENT_COST: f32 = 6.0;
-const FACING_COST: f32 = 2.0;
-const DOUBLESTEP_COST: f32 = 8.0;
-
-#[derive(Copy, Clone)]
-#[non_exhaustive]
-struct CostParams<'a> {
-    stage: &'a DanceStage,
-    prev: &'a State,
-    next: &'a State,
-    dt: f32,
-}
-
-pub fn total_cost(stage: &DanceStage, prev: &State, next: &State, dt: f32) -> f32 {
-    let params = CostParams {
-        stage,
-        prev,
-        next,
-        dt,
-    };
-
-    let mut cost = 0.0;
-    cost += movement_cost(params);
-    cost += facing_cost(params);
-    cost += doublestep_cost(params);
-
-    cost
-}
-
-fn movement_cost(
+pub fn movement_cost(
     CostParams {
         stage,
         prev,
@@ -69,7 +41,7 @@ fn movement_cost(
     cost
 }
 
-fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
+pub fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
     let FootPartIndices {
         left_heel,
         mut left_toe,
@@ -106,23 +78,26 @@ fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
     }
 
     let mut cost = 0.0;
-    cost += penalty(heel_facing) * FACING_COST;
-    cost += penalty(toe_facing) * FACING_COST;
-    cost += penalty(left_facing) * FACING_COST;
-    cost += penalty(right_facing) * FACING_COST;
-    cost
+    cost += penalty(heel_facing);
+    cost += penalty(toe_facing);
+    cost += penalty(left_facing);
+    cost += penalty(right_facing);
+    cost * FACING_COST
 }
 
-fn doublestep_cost(
+pub fn doublestep_cost(
     CostParams {
         stage, prev, next, ..
     }: CostParams,
 ) -> f32 {
-    let activated_one_side_only =
-        next.side_activated(Side::Left) ^ next.side_activated(Side::Right);
-    if !activated_one_side_only {
+    // Check if this was a jump
+    let is_jump = next.side_activated(Side::Left) && next.side_activated(Side::Right);
+    let was_jump = prev.side_activated(Side::Left) && prev.side_activated(Side::Right);
+    if is_jump || was_jump {
         return 0.0;
     }
+
+    // Check if previous row was a jump as well
 
     let activated_side = if next.side_activated(Side::Left) {
         Side::Left
@@ -156,4 +131,18 @@ fn doublestep_cost(
         * stage
             .distance_between(prev_heel.unwrap(), next_heel.unwrap())
             .powi(3)
+}
+
+pub fn mine_cost(
+    CostParams {
+        stage, row, next, ..
+    }: CostParams,
+) -> f32 {
+    let mut cost = 0.0;
+    for column in 0..stage.column_count() {
+        if row[column].key_type == KeyType::Mine && next.final_columns.0[column] != FootPart::None {
+            cost += MINE_COST;
+        }
+    }
+    cost
 }

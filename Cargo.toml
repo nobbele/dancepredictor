@@ -10,11 +10,18 @@ path = "src/lib.rs"
 [[bin]]
 name = "dancepredictor-bin"
 path = "src/bin.rs"
+required-features = ["cli"]
+
+[features]
+cli = ["clap"]
 
 [dependencies]
 rgc-chart = "0.0.8"
 petgraph = "0.8.2"
 ordered-float = "5.0.0"
 approx = "0.5.1"
-smallvec = { version = "1.15.1", features = ["union"] }
+# smallvec = { version = "1.15.1", features = ["union"] }
 rustc-hash = "2.1.1"
+
+# Binary Dependencies
+clap = { version = "4.5.42", optional = true }

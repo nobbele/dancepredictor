@@ -1,7 +1,6 @@
 use crate::extensions::HasPressRequirement;
 use crate::stage::DanceStage;
-use rgc_chart::models::common::Row;
-use smallvec::{smallvec, SmallVec};
+use rgc_chart::models::common::Key;
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq, Hash)]
@@ -28,6 +27,17 @@ impl FootPart {
             Self::RightHeel,
             Self::RightToe,
         ]
+    }
+
+    pub const fn parse(c: char) -> Option<Self> {
+        match c {
+            'L' => Some(Self::LeftHeel),
+            'l' => Some(Self::LeftToe),
+            'R' => Some(Self::RightHeel),
+            'r' => Some(Self::RightToe),
+            '-' => Some(Self::None),
+            _ => None,
+        }
     }
 
     pub(crate) fn is_toe(&self) -> bool {
@@ -93,11 +103,22 @@ impl Display for FootPart {
 
 /// Represents what foot part is on a column.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct FootPlacement(pub SmallVec<[FootPart; 4]>);
+pub struct FootPlacement(pub Vec<FootPart>);
 
 impl FootPlacement {
-    pub(crate) fn new(columns: usize) -> Self {
-        FootPlacement(smallvec![FootPart::None; columns])
+    pub fn new(columns: usize) -> Self {
+        FootPlacement(vec![FootPart::None; columns])
+    }
+
+    pub fn from_ddr_solo(left: FootPart, down: FootPart, up: FootPart, right: FootPart) -> Self {
+        FootPlacement(vec![left, down, up, right])
+    }
+
+    pub fn parse(s: &str) -> Option<Self> {
+        s.chars()
+            .map(|c| FootPart::parse(c))
+            .collect::<Option<_>>()
+            .map(|v| FootPlacement(v))
     }
 
     pub(crate) fn get_foot_part_index(&self, part: FootPart) -> Option<usize> {
@@ -141,11 +162,10 @@ impl Debug for FootPlacement {
 
 impl Display for FootPlacement {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"")?;
         for part in &self.0 {
             <FootPart as Display>::fmt(&part, f)?;
         }
-        write!(f, "\"")
+        Ok(())
     }
 }
 
@@ -157,7 +177,7 @@ pub struct FootPartIndices {
     pub right_toe: Option<usize>,
 }
 
-pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &Row) -> Vec<FootPlacement> {
+pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &[Key]) -> Vec<FootPlacement> {
     let mut permutations = Vec::new();
 
     permute_foot_placement(
@@ -174,7 +194,7 @@ pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &Row) -> Vec<
 fn permute_foot_placement(
     permutations: &mut Vec<FootPlacement>,
     stage: &DanceStage,
-    row: &Row,
+    row: &[Key],
     current_placement: &FootPlacement,
     column: usize,
 ) {
@@ -236,18 +256,18 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(smallvec![
+                FootPlacement::from_ddr_solo(
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::None,
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::None,
-                ])
+                )
             ]
         );
     }
@@ -262,18 +282,18 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(smallvec![
+                FootPlacement::from_ddr_solo(
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::RightHeel,
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None,
                     FootPart::LeftHeel,
-                ])
+                )
             ]
         );
     }
@@ -288,42 +308,42 @@ mod tests {
         assert_eq!(
             permutations,
             vec![
-                FootPlacement(smallvec![
+                FootPlacement::from_ddr_solo(
                     FootPart::LeftHeel,
                     FootPart::LeftToe,
                     FootPart::None,
                     FootPart::None
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::LeftHeel,
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::LeftToe,
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::RightHeel,
                     FootPart::LeftHeel,
                     FootPart::None,
                     FootPart::None
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::RightHeel,
                     FootPart::RightToe,
                     FootPart::None,
                     FootPart::None
-                ]),
-                FootPlacement(smallvec![
+                ),
+                FootPlacement::from_ddr_solo(
                     FootPart::RightToe,
                     FootPart::RightHeel,
                     FootPart::None,
                     FootPart::None
-                ])
+                )
             ]
         );
     }

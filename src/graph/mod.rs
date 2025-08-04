@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use crate::cost::total_cost;
 use crate::feet::{foot_placement_permutations, FootPlacement};
 use crate::stage::DanceStage;
@@ -5,7 +8,7 @@ use crate::state::State;
 use ordered_float::OrderedFloat;
 use petgraph::algo::astar;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
-use rgc_chart::models::common::Row;
+use rgc_chart::models::common::Key;
 use rustc_hash::FxBuildHasher;
 use std::collections::{HashMap, VecDeque};
 use std::fmt::Display;
@@ -68,7 +71,7 @@ impl StepGraph {
         }
     }
 
-    pub fn append(&mut self, time: f32, row: &Row) {
+    pub fn append(&mut self, time: f32, row: &[Key]) {
         assert_eq!(row.len(), self.dance_stage.column_count());
 
         let permutations = foot_placement_permutations(&self.dance_stage, row);
@@ -80,6 +83,7 @@ impl StepGraph {
                 let prev_state = &self.graph[prev];
                 let cost = total_cost(
                     &self.dance_stage,
+                    row,
                     &prev_state.state,
                     &next_state.state,
                     next_state.time.0 - prev_state.time.0,
@@ -142,90 +146,5 @@ impl StepGraph {
         self.graph.remove_node(final_node);
 
         path
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::feet::FootPart;
-    use rgc_chart::models::common::Key;
-    use smallvec::smallvec;
-
-    #[test]
-    fn test_graph_walk() {
-        let dance_stage = DanceStage::ddr_solo();
-        let mut graph = StepGraph::new(dance_stage);
-        graph.append(
-            0.0,
-            &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
-        );
-        graph.append(
-            1.0,
-            &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
-        );
-        graph.append(
-            2.0,
-            &vec![Key::empty(), Key::empty(), Key::normal(), Key::empty()],
-        );
-        graph.append(
-            3.0,
-            &vec![Key::empty(), Key::empty(), Key::empty(), Key::normal()],
-        );
-        assert_eq!(
-            graph.compute_path(),
-            vec![
-                FootPlacement(smallvec![
-                    FootPart::LeftHeel,
-                    FootPart::None,
-                    FootPart::None,
-                    FootPart::None
-                ]),
-                FootPlacement(smallvec![
-                    FootPart::LeftHeel,
-                    FootPart::RightHeel,
-                    FootPart::None,
-                    FootPart::None
-                ]),
-                FootPlacement(smallvec![
-                    FootPart::None,
-                    FootPart::RightHeel,
-                    FootPart::LeftHeel,
-                    FootPart::None
-                ]),
-                FootPlacement(smallvec![
-                    FootPart::None,
-                    FootPart::None,
-                    FootPart::LeftHeel,
-                    FootPart::RightHeel
-                ])
-            ]
-        );
-    }
-
-    #[test]
-    fn test_graph() {
-        let dance_stage = DanceStage::ddr_solo();
-        let mut graph = StepGraph::new(dance_stage);
-        graph.append(
-            0.0,
-            &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
-        );
-        graph.append(
-            1.0,
-            &vec![Key::empty(), Key::empty(), Key::empty(), Key::normal()],
-        );
-        graph.append(
-            2.0,
-            &vec![Key::empty(), Key::empty(), Key::normal(), Key::empty()],
-        );
-        graph.append(
-            3.0,
-            &vec![Key::normal(), Key::empty(), Key::empty(), Key::normal()],
-        );
-        let path = graph.compute_path();
-        for placement in path {
-            println!("{}", placement);
-        }
     }
 }
