@@ -11,11 +11,10 @@ fn main() {
         .expect("Failed to parse StepMania chart");
 
     for HitObjectView {
-        time: &time, row, ..
+        time, row, ..
     } in chart.hitobjects.iter_views()
     {
-        println!("{} {:?}", time as f32 / 1000.0, row);
-        graph.append(time as f32 / 1000.0, row);
+        graph.append(*time as f32 / 1000.0, row);
     }
 
     write!(

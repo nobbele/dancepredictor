@@ -9,7 +9,6 @@ use basic::*;
 use brackets::*;
 use footswitch_jacks::*;
 use rgc_chart::models::common::Key;
-use std::collections::HashMap;
 
 // TODO Don't ignore holds for costs (esp. when it comes to doublesteps).
 
