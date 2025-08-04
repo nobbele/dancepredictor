@@ -1,0 +1,18 @@
+[package]
+name = "dancepredictor"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "dancepredictor"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dancepredictor-bin"
+path = "src/bin.rs"
+
+[dependencies]
+rgc-chart = "0.0.8"
+petgraph = "0.8.2"
+ordered-float = "5.0.0"
+approx = "0.5.1"
