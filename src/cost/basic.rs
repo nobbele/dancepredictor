@@ -1,7 +1,8 @@
+use danceparser::NoteKind;
+
+use crate::FootPart;
 use crate::cost::{CostParams, DOUBLESTEP_COST, FACING_COST, MINE_COST, MOVEMENT_COST};
 use crate::feet::{FootPartIndices, Side};
-use crate::FootPart;
-use rgc_chart::models::common::KeyType;
 
 pub fn movement_cost(
     CostParams {
@@ -11,7 +12,7 @@ pub fn movement_cost(
         dt,
         ..
     }: CostParams,
-) -> f32 {
+) -> f64 {
     let mut cost = 0.0;
 
     for part in FootPart::all_except_none() {
@@ -41,7 +42,7 @@ pub fn movement_cost(
     cost
 }
 
-pub fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
+pub fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f64 {
     let FootPartIndices {
         left_heel,
         mut left_toe,
@@ -73,7 +74,7 @@ pub fn facing_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
         0.0
     };
 
-    fn penalty(v: f32) -> f32 {
+    fn penalty(v: f64) -> f64 {
         (-1.0 * v.min(0.0)).powf(1.8)
     }
 
@@ -89,7 +90,7 @@ pub fn doublestep_cost(
     CostParams {
         stage, prev, next, ..
     }: CostParams,
-) -> f32 {
+) -> f64 {
     // Check if this was a jump
     let is_jump = next.side_activated(Side::Left) && next.side_activated(Side::Right);
     let was_jump = prev.side_activated(Side::Left) && prev.side_activated(Side::Right);
@@ -137,10 +138,10 @@ pub fn mine_cost(
     CostParams {
         stage, row, next, ..
     }: CostParams,
-) -> f32 {
+) -> f64 {
     let mut cost = 0.0;
     for column in 0..stage.column_count() {
-        if row[column].key_type == KeyType::Mine && next.final_columns.0[column] != FootPart::None {
+        if row.columns[column] == NoteKind::Mine && next.final_columns.0[column] != FootPart::None {
             cost += MINE_COST;
         }
     }

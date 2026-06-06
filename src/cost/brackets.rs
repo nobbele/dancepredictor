@@ -2,7 +2,7 @@ use crate::cost::{CostParams, SLOW_BRACKET_COST, SLOW_BRACKET_THRESHOLD, TWISTED
 use crate::feet::{FootPartIndices, Side};
 use crate::stage::StagePosition;
 
-pub fn twisted_foot_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
+pub fn twisted_foot_cost(CostParams { stage, next, .. }: CostParams) -> f64 {
     let FootPartIndices {
         left_heel,
         left_toe,
@@ -41,7 +41,7 @@ pub fn twisted_foot_cost(CostParams { stage, next, .. }: CostParams) -> f32 {
     TWISTED_FOOT_COST
 }
 
-pub fn slow_bracket_cost(CostParams { next, dt, .. }: CostParams) -> f32 {
+pub fn slow_bracket_cost(CostParams { next, dt, .. }: CostParams) -> f64 {
     let is_bracketing = [Side::Left, Side::Right]
         .into_iter()
         .any(|s| next.activated_columns.is_bracketing(s));
@@ -63,19 +63,19 @@ pub fn slow_bracket_cost(CostParams { next, dt, .. }: CostParams) -> f32 {
 //     let mut graph = StepGraph::new(dance_stage);
 //     graph.append(
 //         0.041,
-//         &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Tap, NoteKind::Empty, NoteKind::Empty],
 //     );
 //     graph.append(
 //         0.927,
-//         &vec![Key::empty(), Key::empty(), Key::empty(), Key::normal()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Empty, NoteKind::Empty, NoteKind::Tap],
 //     );
 //     graph.append(
 //         1.814,
-//         &vec![Key::empty(), Key::empty(), Key::normal(), Key::normal()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Empty, NoteKind::Tap, NoteKind::Tap],
 //     );
 //     graph.append(
 //         2.258,
-//         &vec![Key::normal(), Key::empty(), Key::empty(), Key::normal()],
+//         &Row { columns: &vec![NoteKind::Tap, NoteKind::Empty, NoteKind::Empty, NoteKind::Tap],
 //     );
 //     assert_eq!(
 //         graph.compute_path(),

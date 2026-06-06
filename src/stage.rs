@@ -2,10 +2,10 @@ use ordered_float::NotNan;
 use std::ops::{Add, Div};
 
 #[derive(Debug, Copy, Clone, PartialEq, Hash)]
-pub struct StagePosition(pub NotNan<f32>, pub NotNan<f32>);
+pub struct StagePosition(pub NotNan<f64>, pub NotNan<f64>);
 
 impl StagePosition {
-    pub fn new(x: f32, y: f32) -> StagePosition {
+    pub fn new(x: f64, y: f64) -> StagePosition {
         StagePosition(NotNan::new(x).unwrap(), NotNan::new(y).unwrap())
     }
 }
@@ -18,10 +18,10 @@ impl Add for StagePosition {
     }
 }
 
-impl Div<f32> for StagePosition {
+impl Div<f64> for StagePosition {
     type Output = Self;
 
-    fn div(self, rhs: f32) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         StagePosition(
             NotNan::new(self.0 / rhs).unwrap(),
             NotNan::new(self.1 / rhs).unwrap(),
@@ -58,7 +58,7 @@ impl DanceStage {
         self.y(p) == 0.0 && self.x(p).abs() >= 1.0
     }
 
-    pub fn distance_between(&self, a: usize, b: usize) -> f32 {
+    pub fn distance_between(&self, a: usize, b: usize) -> f64 {
         let a = self.columns[a];
         let b = self.columns[b];
 
@@ -66,32 +66,32 @@ impl DanceStage {
     }
 
     // Get the sine value of two panels on the stage
-    pub fn sin(&self, a: usize, b: usize) -> f32 {
+    pub fn sin(&self, a: usize, b: usize) -> f64 {
         let l = self.distance_between(a, b);
         (self.columns[b].1 - self.columns[a].1) / l
     }
 
     // Get the cosine value of two panels on the stage
-    pub fn cos(&self, a: usize, b: usize) -> f32 {
+    pub fn cos(&self, a: usize, b: usize) -> f64 {
         let l = self.distance_between(a, b);
         (self.columns[b].0 - self.columns[a].0) / l
     }
 
-    pub fn x_difference(&self, left: usize, right: usize) -> f32 {
+    pub fn x_difference(&self, left: usize, right: usize) -> f64 {
         if left == right {
             return 0.0;
         }
 
-        let sign = (self.columns[right].0 - self.columns[left].0).signum() as f32;
+        let sign = (self.columns[right].0 - self.columns[left].0).signum();
         self.cos(left, right).powf(4.0) * sign
     }
 
-    pub fn y_difference(&self, left: usize, right: usize) -> f32 {
+    pub fn y_difference(&self, left: usize, right: usize) -> f64 {
         if left == right {
             return 0.0;
         }
 
-        let sign = (self.columns[right].1 - self.columns[left].1).signum() as f32;
+        let sign = (self.columns[right].1 - self.columns[left].1).signum() as f64;
         self.sin(left, right).powf(4.0) * sign
     }
 
@@ -99,11 +99,11 @@ impl DanceStage {
         self.columns[index]
     }
 
-    pub fn x(&self, index: usize) -> f32 {
+    pub fn x(&self, index: usize) -> f64 {
         self.position(index).0.into_inner()
     }
 
-    pub fn y(&self, index: usize) -> f32 {
+    pub fn y(&self, index: usize) -> f64 {
         self.position(index).1.into_inner()
     }
 

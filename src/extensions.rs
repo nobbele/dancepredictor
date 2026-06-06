@@ -1,4 +1,4 @@
-use rgc_chart::models::common::KeyType;
+use danceparser::NoteKind;
 
 pub trait HasPressRequirement {
     fn require_press(&self) -> bool;
@@ -6,12 +6,15 @@ pub trait HasPressRequirement {
     fn require_release(&self) -> bool;
 }
 
-impl HasPressRequirement for KeyType {
+impl HasPressRequirement for NoteKind {
     fn require_press(&self) -> bool {
-        matches!(self, KeyType::Normal | KeyType::SliderStart)
+        matches!(
+            self,
+            NoteKind::Tap | NoteKind::HoldHead | NoteKind::RollHead
+        )
     }
 
     fn require_release(&self) -> bool {
-        matches!(self, KeyType::Mine)
+        matches!(self, NoteKind::Mine)
     }
 }

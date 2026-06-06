@@ -1,20 +1,21 @@
+use danceparser::{
+    SMChart,
+    view::{NoteView, NoteViewer},
+};
 use dancepredictor::{DanceStage, StepGraph};
-use rgc_chart::models::hitobjects::HitObjectView;
-use std::io::Write;
 use petgraph::dot::Dot;
+use std::io::{Cursor, Write};
 
 fn main() {
     let dance_stage = DanceStage::ddr_solo();
     let mut graph = StepGraph::new(dance_stage);
 
-    let chart = rgc_chart::parse::from_sm(include_str!("../basic.sm"))
+    let chart = SMChart::from_sm(Cursor::new(include_str!("../basic.sm")))
         .expect("Failed to parse StepMania chart");
+    let notes_data = &chart.notes.first().unwrap();
 
-    for HitObjectView {
-        time, row, ..
-    } in chart.hitobjects.iter_views()
-    {
-        graph.append(*time as f32 / 1000.0, row);
+    for NoteView { time, row, .. } in NoteViewer::new(&chart, notes_data) {
+        graph.append(time / 1000.0, row);
     }
 
     write!(
@@ -24,8 +25,8 @@ fn main() {
     )
     .unwrap();
 
-    let path = graph.compute_path();
-    for row in path {
-        println!("{}", row);
+    let steps = graph.compute_steps();
+    for step in steps {
+        println!("{}", step.columns);
     }
 }

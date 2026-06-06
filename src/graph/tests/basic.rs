@@ -1,5 +1,5 @@
 use crate::{DanceStage, FootPart, FootPlacement, StepGraph};
-use rgc_chart::models::common::Key;
+use danceparser::{NoteKind, Row};
 
 #[test]
 fn test_graph_walk() {
@@ -7,19 +7,47 @@ fn test_graph_walk() {
     let mut graph = StepGraph::new(dance_stage);
     graph.append(
         0.0,
-        &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+        &Row {
+            columns: vec![
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
         1.0,
-        &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
         2.0,
-        &vec![Key::empty(), Key::empty(), Key::normal(), Key::empty()],
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Tap,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
         3.0,
-        &vec![Key::empty(), Key::empty(), Key::empty(), Key::normal()],
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Tap,
+            ],
+        },
     );
     assert_eq!(
         graph.compute_path(),
@@ -51,54 +79,3 @@ fn test_graph_walk() {
         ]
     );
 }
-
-// #[test]
-// fn test_graph_jumps() {
-//     let dance_stage = DanceStage::ddr_solo();
-//     let mut graph = StepGraph::new(dance_stage);
-//     graph.append(
-//         0.0,
-//         &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
-//     );
-//     graph.append(
-//         1.0,
-//         &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
-//     );
-//     graph.append(
-//         2.0,
-//         &vec![Key::normal(), Key::empty(), Key::empty(), Key::normal()],
-//     );
-//     graph.append(
-//         3.0,
-//         &vec![Key::normal(), Key::empty(), Key::normal(), Key::empty()],
-//     );
-//     assert_eq!(
-//         graph.compute_path(),
-//         vec![
-//             FootPlacement::from_ddr_solo(
-//                 FootPart::LeftHeel,
-//                 FootPart::None,
-//                 FootPart::None,
-//                 FootPart::None
-//             ),
-//             FootPlacement::from_ddr_solo(
-//                 FootPart::LeftHeel,
-//                 FootPart::RightHeel,
-//                 FootPart::None,
-//                 FootPart::None
-//             ),
-//             FootPlacement::from_ddr_solo(
-//                 FootPart::LeftHeel,
-//                 FootPart::None,
-//                 FootPart::None,
-//                 FootPart::RightHeel
-//             ),
-//             FootPlacement::from_ddr_solo(
-//                 FootPart::LeftHeel,
-//                 FootPart::None,
-//                 FootPart::RightHeel,
-//                 FootPart::None
-//             )
-//         ]
-//     );
-// }

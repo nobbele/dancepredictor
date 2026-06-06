@@ -1,9 +1,9 @@
+use crate::FootPart;
 use crate::cost::{
     CostParams, JACK_COST, JACK_THRESHOLD, SIDESWITCH_COST, SLOW_FOOTSWITCH_COST,
     SLOW_FOOTSWITCH_THRESHOLD,
 };
 use crate::feet::Side;
-use crate::FootPart;
 
 fn jacked_side(CostParams { prev, next, .. }: CostParams, side: Side) -> bool {
     let heel = FootPart::heel(side);
@@ -22,7 +22,7 @@ fn jacked_side(CostParams { prev, next, .. }: CostParams, side: Side) -> bool {
     jacked_heel || jacked_toe
 }
 
-pub fn jack_cost(params @ CostParams { dt, .. }: CostParams) -> f32 {
+pub fn jack_cost(params @ CostParams { dt, .. }: CostParams) -> f64 {
     if dt > JACK_THRESHOLD {
         return 0.0;
     }
@@ -49,7 +49,7 @@ pub fn footswitch_cost(
         dt,
         ..
     }: CostParams,
-) -> f32 {
+) -> f64 {
     if dt < SLOW_FOOTSWITCH_THRESHOLD {
         return 0.0;
     }

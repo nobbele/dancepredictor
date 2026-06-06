@@ -1,6 +1,6 @@
 use crate::extensions::HasPressRequirement;
 use crate::stage::DanceStage;
-use rgc_chart::models::common::Key;
+use danceparser::Row;
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq, Hash)]
@@ -177,14 +177,14 @@ pub struct FootPartIndices {
     pub right_toe: Option<usize>,
 }
 
-pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &[Key]) -> Vec<FootPlacement> {
+pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &Row) -> Vec<FootPlacement> {
     let mut permutations = Vec::new();
 
     permute_foot_placement(
         &mut permutations,
         stage,
         row,
-        &FootPlacement::new(row.len()),
+        &FootPlacement::new(row.columns.len()),
         0,
     );
 
@@ -194,11 +194,11 @@ pub(crate) fn foot_placement_permutations(stage: &DanceStage, row: &[Key]) -> Ve
 fn permute_foot_placement(
     permutations: &mut Vec<FootPlacement>,
     stage: &DanceStage,
-    row: &[Key],
+    row: &Row,
     current_placement: &FootPlacement,
     column: usize,
 ) {
-    if column >= row.len() {
+    if column >= row.columns.len() {
         let indices = current_placement.get_foot_part_indices();
 
         // TODO This algorithm assumes you will always use the heel at least,
@@ -222,8 +222,8 @@ fn permute_foot_placement(
         return;
     }
 
-    if let Some(column_key) = row.get(column)
-        && column_key.key_type.require_press()
+    if let Some(note) = row.columns.get(column)
+        && note.require_press()
     {
         let mut new_placement = current_placement.clone();
         for foot_part in FootPart::all_except_none() {
@@ -244,13 +244,20 @@ fn permute_foot_placement(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rgc_chart::models::common::Key;
+    use danceparser::NoteKind;
 
     #[test]
     fn test_tap_permutations() {
         let permutations = foot_placement_permutations(
             &DanceStage::ddr_solo(),
-            &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+            &Row {
+                columns: vec![
+                    NoteKind::Tap,
+                    NoteKind::Empty,
+                    NoteKind::Empty,
+                    NoteKind::Empty,
+                ],
+            },
         );
 
         assert_eq!(
@@ -276,7 +283,14 @@ mod tests {
     fn test_jump_permutations() {
         let permutations = foot_placement_permutations(
             &DanceStage::ddr_solo(),
-            &vec![Key::normal(), Key::empty(), Key::empty(), Key::normal()],
+            &Row {
+                columns: vec![
+                    NoteKind::Tap,
+                    NoteKind::Empty,
+                    NoteKind::Empty,
+                    NoteKind::Tap,
+                ],
+            },
         );
 
         assert_eq!(
@@ -302,7 +316,14 @@ mod tests {
     fn test_bracket_permutations() {
         let permutations = foot_placement_permutations(
             &DanceStage::ddr_solo(),
-            &vec![Key::normal(), Key::normal(), Key::empty(), Key::empty()],
+            &Row {
+                columns: vec![
+                    NoteKind::Tap,
+                    NoteKind::Tap,
+                    NoteKind::Empty,
+                    NoteKind::Empty,
+                ],
+            },
         );
 
         assert_eq!(

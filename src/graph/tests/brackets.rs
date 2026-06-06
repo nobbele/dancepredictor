@@ -1,27 +1,56 @@
-use std::io::Write;
-use petgraph::dot::Dot;
 use crate::{DanceStage, FootPlacement, StepGraph};
-use rgc_chart::models::common::Key;
+use danceparser::{NoteKind, Row};
+use petgraph::dot::Dot;
+use std::io::Write;
 
 #[test]
 fn test_graph_brackets_instead_of_jumps() {
     let dance_stage = DanceStage::ddr_solo();
     let mut graph = StepGraph::new(dance_stage);
+    let dt = 0.1;
     graph.append(
-        0.1,
-        &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+        1.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
-        0.2,
-        &vec![Key::empty(), Key::empty(), Key::normal(), Key::normal()],
+        2.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Tap,
+                NoteKind::Tap,
+            ],
+        },
     );
     graph.append(
-        0.3,
-        &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+        3.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
-        0.4,
-        &vec![Key::empty(), Key::normal(), Key::empty(), Key::normal()],
+        4.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Tap,
+            ],
+        },
     );
     assert_eq!(
         graph.compute_path(),
@@ -38,27 +67,49 @@ fn test_graph_brackets_instead_of_jumps() {
 fn test_graph_jumps_instead_of_brackets() {
     let dance_stage = DanceStage::ddr_solo();
     let mut graph = StepGraph::new(dance_stage);
+    let dt = 0.5;
     graph.append(
-        1.0,
-        &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+        1.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     graph.append(
-        2.0,
-        &vec![Key::empty(), Key::empty(), Key::normal(), Key::normal()],
+        2.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Tap,
+                NoteKind::Tap,
+            ],
+        },
     );
     graph.append(
-        3.0,
-        &vec![Key::normal(), Key::empty(), Key::empty(), Key::empty()],
+        3.0 * dt,
+        &Row {
+            columns: vec![
+                NoteKind::Tap,
+                NoteKind::Empty,
+                NoteKind::Empty,
+                NoteKind::Empty,
+            ],
+        },
     );
     write!(
         std::fs::File::create("out.txt").unwrap(),
         "{}",
         Dot::with_config(&graph.graph, &[])
     )
-        .unwrap();
+    .unwrap();
     // graph.append(
     //     4.0,
-    //     &vec![Key::empty(), Key::normal(), Key::empty(), Key::normal()],
+    //     &Row { columns: &vec![NoteKind::Empty, NoteKind::Tap, NoteKind::Empty, NoteKind::Tap],
     // );
     assert_eq!(
         graph.compute_path(),
@@ -77,19 +128,19 @@ fn test_graph_jumps_instead_of_brackets() {
 //     let mut graph = StepGraph::new(dance_stage);
 //     graph.append(
 //         0.0,
-//         &vec![Key::empty(), Key::empty(), Key::empty(), Key::normal()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Empty, NoteKind::Empty, NoteKind::Tap],
 //     );
 //     graph.append(
 //         0.1,
-//         &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Tap, NoteKind::Empty, NoteKind::Empty],
 //     );
 //     graph.append(
 //         0.2,
-//         &vec![Key::normal(), Key::empty(), Key::normal(), Key::empty()],
+//         &Row { columns: &vec![NoteKind::Tap, NoteKind::Empty, NoteKind::Tap, NoteKind::Empty],
 //     );
 //     graph.append(
 //         0.3,
-//         &vec![Key::empty(), Key::normal(), Key::empty(), Key::empty()],
+//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Tap, NoteKind::Empty, NoteKind::Empty],
 //     );
 //     assert_eq!(
 //         graph.compute_path(),
