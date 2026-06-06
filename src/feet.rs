@@ -9,7 +9,7 @@ pub enum Side {
     Right,
 }
 
-// Possible foot placement states for a column.
+/// Possible foot placement states for a column.
 #[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Hash)]
 pub enum FootPart {
     None,

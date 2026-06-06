@@ -55,14 +55,5 @@ pub fn total_cost(stage: &DanceStage, row: &Row, prev: &State, next: &State, dt:
     cost += jack_cost(params);
     cost += footswitch_cost(params);
 
-    // let mut costs = HashMap::new();
-    // costs.insert("doublestep_cost", doublestep_cost(params));
-    // costs.insert("total", cost);
-    //
-    // println!(
-    //     "{} -> {} costs [{:?}]",
-    //     prev.final_columns, next.final_columns, costs
-    // );
-
     cost
 }

@@ -24,5 +24,3 @@ pub fn generate_steps(viewer: NoteViewer) -> Vec<StepEntry> {
 
     graph.compute_steps()
 }
-
-// let chart = parse::from_sm(include_str!("../basic.sm")).expect("Failed to parse Stepmania chart");

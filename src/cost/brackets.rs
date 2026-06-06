@@ -56,34 +56,3 @@ pub fn slow_bracket_cost(CostParams { next, dt, .. }: CostParams) -> f64 {
     let time_diff = dt - SLOW_BRACKET_THRESHOLD;
     time_diff * SLOW_BRACKET_COST
 }
-
-// #[test]
-// fn test() {
-//     let dance_stage = DanceStage::ddr_solo();
-//     let mut graph = StepGraph::new(dance_stage);
-//     graph.append(
-//         0.041,
-//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Tap, NoteKind::Empty, NoteKind::Empty],
-//     );
-//     graph.append(
-//         0.927,
-//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Empty, NoteKind::Empty, NoteKind::Tap],
-//     );
-//     graph.append(
-//         1.814,
-//         &Row { columns: &vec![NoteKind::Empty, NoteKind::Empty, NoteKind::Tap, NoteKind::Tap],
-//     );
-//     graph.append(
-//         2.258,
-//         &Row { columns: &vec![NoteKind::Tap, NoteKind::Empty, NoteKind::Empty, NoteKind::Tap],
-//     );
-//     assert_eq!(
-//         graph.compute_path(),
-//         vec![
-//             FootPlacement::parse("-L--").unwrap(),
-//             FootPlacement::parse("-L-R").unwrap(),
-//             FootPlacement::parse("--LR").unwrap(),
-//             FootPlacement::parse("L--R").unwrap(),
-//         ]
-//     );
-// }

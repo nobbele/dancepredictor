@@ -65,13 +65,13 @@ impl DanceStage {
         ((a.0 - b.0).powi(2) + (a.1 - b.1).powi(2)).sqrt()
     }
 
-    // Get the sine value of two panels on the stage
+    /// Get the sine value of two panels on the stage
     pub fn sin(&self, a: usize, b: usize) -> f64 {
         let l = self.distance_between(a, b);
         (self.columns[b].1 - self.columns[a].1) / l
     }
 
-    // Get the cosine value of two panels on the stage
+    /// Get the cosine value of two panels on the stage
     pub fn cos(&self, a: usize, b: usize) -> f64 {
         let l = self.distance_between(a, b);
         (self.columns[b].0 - self.columns[a].0) / l
