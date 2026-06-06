@@ -1,7 +1,14 @@
 [package]
 name = "dancepredictor"
+description = "StepMania Step Generator"
+keywords = ["stepmania", "itgmania", "ddr", "sm"]
+
 version = "0.1.0"
 edition = "2024"
+
+license = "MIT"
+repository = "https://codeberg.org/nobbele/dancepredictor"
+homepage = "https://codeberg.org/nobbele/dancepredictor"
 
 [lib]
 name = "dancepredictor"
