@@ -39,6 +39,7 @@ impl GraphState {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StepEntry {
+    pub time: OrderedFloat<f64>,
     pub row_index: usize,
     pub activated_columns: FootPlacement,
     pub columns: FootPlacement,
@@ -86,7 +87,13 @@ impl StepGraph {
     }
 
     pub fn append(&mut self, time: f64, row: &Row) {
-        assert_eq!(row.columns.len(), self.dance_stage.column_count());
+        assert_eq!(
+            row.columns.len(),
+            self.dance_stage.column_count(),
+            "Got row ({:?}), expected {} columns",
+            row.columns,
+            self.dance_stage.column_count()
+        );
 
         let permutations = foot_placement_permutations(&self.dance_stage, row);
 
@@ -168,6 +175,7 @@ impl StepGraph {
                     let graph_state = &self.graph[*node];
                     let state = &graph_state.state;
                     StepEntry {
+                        time: graph_state.time,
                         row_index: graph_state.row_index.unwrap(),
                         activated_columns: state.activated_columns.clone(),
                         columns: state.final_columns.clone(),

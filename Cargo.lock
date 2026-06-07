@@ -111,16 +111,16 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 
 [[package]]
 name = "danceparser"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10c86285689b2b69e4de396fcfe2290b949aff2a6672742a1b16b06cb91e088c"
+checksum = "e71aef3f80f765c3f53ad5095d9e9409717303914aa6390a01570e7b288d6f1b"
 dependencies = [
  "regex",
 ]
 
 [[package]]
 name = "dancepredictor"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "approx",
  "clap",

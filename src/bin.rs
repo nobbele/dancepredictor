@@ -12,10 +12,10 @@ fn main() {
 
     let chart = SMChart::from_sm(Cursor::new(include_str!("../basic.sm")))
         .expect("Failed to parse StepMania chart");
-    let notes_data = &chart.notes.first().unwrap();
+    let notes_data = chart.notes.first().unwrap();
 
     for NoteView { time, row, .. } in NoteViewer::new(&chart, notes_data) {
-        graph.append(time / 1000.0, row);
+        graph.append(time, row);
     }
 
     write!(

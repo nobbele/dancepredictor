@@ -3,7 +3,7 @@ name = "dancepredictor"
 description = "StepMania Step Generator"
 keywords = ["stepmania", "itgmania", "ddr", "sm"]
 
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 license = "MIT"
@@ -23,7 +23,7 @@ required-features = ["cli"]
 cli = ["clap"]
 
 [dependencies]
-danceparser = "0.2.0"
+danceparser = "0.2.1"
 petgraph = "0.8.3"
 ordered-float = "5.3.0"
 approx = "0.5.1"

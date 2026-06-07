@@ -119,19 +119,16 @@ pub fn doublestep_cost(
         .activated_columns
         .get_foot_part_index(FootPart::toe(activated_side));
 
-    if prev_heel == None {
-        return 0.0;
+    match (prev_heel, next_heel) {
+        (Some(ph), Some(nh)) => {
+            let jacked = prev_heel == next_heel && prev_toe == next_toe;
+            if jacked {
+                return 0.0;
+            }
+            DOUBLESTEP_COST * stage.distance_between(ph, nh).powi(3)
+        }
+        _ => 0.0,
     }
-
-    let jacked = prev_heel == next_heel && prev_toe == next_toe;
-    if jacked {
-        return 0.0;
-    }
-
-    DOUBLESTEP_COST
-        * stage
-            .distance_between(prev_heel.unwrap(), next_heel.unwrap())
-            .powi(3)
 }
 
 pub fn mine_cost(
